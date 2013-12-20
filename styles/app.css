@@ -1,0 +1,31 @@
+.navbar h1{
+	margin:0;
+}
+.container{
+	width:auto;
+}
+td{
+	vertical-align: top;
+}
+
+
+.crossword {
+	border-collapse:collapse;
+	font-family:"Courier New", Courier, monospace;
+	margin-left:auto;
+	margin-right:auto;
+	clear:both;
+	margin-top:10px;
+	margin-bottom:10px;
+}
+
+.crossword td {
+	border:1px solid black;
+	padding:0;
+	margin:0;
+	vertical-align:middle;
+	padding:0;
+	text-align:center;
+	width:30px;
+	height:30px;
+}

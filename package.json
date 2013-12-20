@@ -1,0 +1,9 @@
+{
+  "name": "crosswordify",
+  "browserify": {
+    "transform": "workerify"
+  },
+  "dependencies": {
+    "workerify": "~0.2.3"
+  }
+}
