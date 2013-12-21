@@ -18,7 +18,8 @@
 		<!-- Collect the nav links, forms, and other content for toggling -->
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
-				<li class="active"><a href="#">Link</a></li>
+				<li class="active"><a href="#" id="undo">Undo</a></li>
+				<li class="active"><a href="#" id="redo">Redo</a></li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li><a href="#">Link</a></li>
@@ -38,12 +39,18 @@
 								<tr>
 									<th>Word</th>
 									<th>Clue</th>
+									<th>y</th>
+									<th>x</th>
+									<th>Dir</th>
 								</tr>
 							</thead>
 							<tbody class="expandy">
 								<tr class="expandthing">
 									<td><input class="form-control word" type="text"></td>
-									<td><textarea class="form-control clue" type="text"></textarea></td>
+									<td><textarea class="form-control clue" rows="1" type="text"></textarea></td>
+									<td class="tiny"><input class="form-control y" type="text"></td>
+									<td class="tiny"><input class="form-control x" type="text"></td>
+									<td class="tiny"><input class="form-control dir" type="text"></td>
 									<td><button type="button" title="Delete this row" class="btn btn-default deleterow"><span class="glyphicon glyphicon-remove"></span><span class="hide">Delete</span></button></td>
 								</tr>
 							</tbody>

@@ -6,6 +6,26 @@
 }
 td{
 	vertical-align: top;
+	cursor:default;
+}
+td:hover{
+	background:#ffffdd;
+	color:black;
+}
+
+.first:before{
+	content:attr(data-word);
+	position:absolute;
+	font-size:.7em;
+	margin-left:-8px;
+	margin-top:-4px;
+}
+
+.tiny{
+	width:2.5em;
+}
+.tiny input{
+	width:2.5em;
 }
 
 

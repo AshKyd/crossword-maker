@@ -33,9 +33,12 @@ function CrosswordCell(letter){
 
 // You can tell if the Node is the start of a word (which is needed if you want to number the cells)
 // and what word and clue it corresponds to (using the index)
-function CrosswordCellNode(is_start_of_word, index){
-    this.is_start_of_word = is_start_of_word;
-    this.index = index; // use to map this node to its word or clue
+function CrosswordCellNode(opts){
+    this.is_start_of_word = opts.is_start_of_word;
+    this.index = opts.index; // use to map this node to its word or clue
+    if(opts.word){
+        this.word = opts.word;
+    }
 }
 
 function WordElement(word, index){
@@ -211,7 +214,11 @@ function Crossword(words_in, clues_in){
         }
 
         var is_start_of_word = index_of_char == 0;
-        grid[r][c][direction] = new CrosswordCellNode(is_start_of_word, index_of_word_in_input_list);
+        grid[r][c][direction] = new CrosswordCellNode({
+            is_start_of_word : is_start_of_word,
+            index : index_of_word_in_input_list,
+            word : is_start_of_word ? word : false
+        });
 
     }	
 
@@ -378,7 +385,8 @@ function Crossword(words_in, clues_in){
     }
 
     // build the element list (need to keep track of indexes in the originial input arrays)
-    var word_elements = [];	
+    var word_elements = [];
+    this.word_elements = word_elements; // Make this publicly accessible.
     for(var i = 0; i < words_in.length; i++){
         word_elements.push(new WordElement(words_in[i], i));
     }
@@ -411,9 +419,7 @@ var CrosswordUtils = {
                 }
 
                 if(is_start_of_word) {
-                    var img_url = CrosswordUtils.PATH_TO_PNGS_OF_NUMBERS + label + ".png";
-                    html.push("<td class='" + css_class + "' title='" + r + ", " + c + "' style=\"background-image:url('" + img_url + "')\">");
-                    label++;			
+                    html.push("<td class='" + css_class + " first' data-word='"+(label++)+"' title='" + r + ", " + c + "'>");
                 } else {
                     html.push("<td class='" + css_class + "' title='" + r + ", " + c + "'>");					
                 }

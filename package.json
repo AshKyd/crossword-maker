@@ -4,6 +4,7 @@
     "transform": "workerify"
   },
   "dependencies": {
-    "workerify": "~0.2.3"
+    "workerify": "~0.2.3",
+    "browserify-handlebars": "~0.1.0"
   }
 }

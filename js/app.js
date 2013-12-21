@@ -5,6 +5,11 @@ require('../bower_components/bootstrap/dist/js/bootstrap.js');
 var LOCALKEY='crosswordify'
 
 $(document).ready(function(){
+
+	var undoStack = [];
+	var redoStack = [];
+	var saveFields = ['word','clue','x','y','dir'];
+
 	/**
 	 * Expandy
 	 */
@@ -35,8 +40,13 @@ $(document).ready(function(){
 	$('form.clues').submit(function(){
 
 		var inputs = encodeForm();
-		var $dest = $('.crossword-preview');
-		$dest.text('Generating');
+		var words = [];
+		var clues = [];
+		inputs.forEach(function(input){
+			words.push(input.word);
+			clues.push(input.clue);
+		})
+		$('.crossword-preview').text('Generating');
 
 		var crossWorker = new Worker('./crossworker.js');
 		crossWorker.onmessage = function(oEvent){
@@ -45,25 +55,88 @@ $(document).ready(function(){
 				return;
 			}
 			if(oEvent.data.resultHtml){
-				$dest.html(oEvent.data.resultHtml);
+				doThis(loadFromGenerator,oEvent.data);
 			}
 		}
-		crossWorker.postMessage(inputs);
+		crossWorker.postMessage({
+			word:words,
+			clue:clues
+		});
 		
 		// Create crossword object with the words and clues
 		return false;
 	});
 
-	var encodeForm = function(){
-		var inputs = {
-			word: [],
-			clue: []
-		}
+	$('#undo').click(function(){
+		undo();
+	});
+	$('#redo').click(function(){
+		redo();
+	});
 
-		$.each(['word','clue'],function(i,val){
-			$('form.clues tr:not(:last-child)').find('input.'+val+',textarea.'+val).each(function(){
-				inputs[val].push($(this).val());
-			})
+	var undo = function(){
+		if(undoStack.length){
+			var action = undoStack.pop();
+			doThis(action[0],action[1],'redo');
+		}
+	}
+
+	var redo = function(){
+		if(redoStack.length){
+			var action = redoStack.pop();
+			doThis(action[0],action[1],'undo');
+		}
+	}
+
+	var doThis = function(action,data,doWut){
+		if(doWut == 'redo'){
+			redoStack.push([action,data]);
+		} else {
+			undoStack.push([action,data]);
+		}
+		action(data);
+	}
+
+	var loadFromGenerator = function(data){
+
+		$('.crossword-preview').html(data.resultHtml);
+
+		// Loop through each cell.
+		data.resultGrid.forEach(function(gy,y){
+			gy.forEach(function(gx,x){
+				if(gx === null){
+					return;
+				}
+				// Find words
+				['across','down'].forEach(function(dir){
+					var word = gx[dir];
+					if(word === null || !word.is_start_of_word){
+						return;
+					}
+					$('.clues .expandthing').each(function(){
+						if($(this).find('.word').val() == word.word){
+							$(this).find('.x').val(x);
+							$(this).find('.y').val(y);
+							$(this).find('.dir').val(dir.substr(0,1));
+						}
+					});
+				})
+			});
+		});
+	}
+
+	var encodeForm = function(){
+		var inputs = [];
+
+		$('form.clues tr:not(:last-child)').each(function(){
+			var $parent = $(this);
+			var row = {};
+			$.each(saveFields,function(i,val){
+				$parent.find('input.'+val+',textarea.'+val).each(function(){
+					row[val] = $(this).val();
+				});
+			});
+			inputs.push(row);
 		});
 		return inputs;
 	}
@@ -72,7 +145,6 @@ $(document).ready(function(){
 		var state = {
 			inputs: encodeForm()
 		};
-		console.log(state);
 		localStorage[LOCALKEY] = JSON.stringify(state);
 	}
 
@@ -87,12 +159,13 @@ $(document).ready(function(){
 
 		var $template = $('.expandy .expandthing');
 
-		for(var i=0;i<state.inputs.word.length; i++){
+		for(var i=0;i<state.inputs.length; i++){
 			var $new = $template.clone();
-			$.each(['word','clue'],function(j,element){
+			$.each(saveFields,function(j,ele){
+
 				$new
-					.find('.'+element)
-					.val(state.inputs[element][i])
+					.find('.'+ele)
+					.val(state.inputs[i][ele])
 					.on('change keyup',expandyHandler);
 			});
 			$template.before($new);

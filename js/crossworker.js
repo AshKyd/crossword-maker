@@ -7,7 +7,7 @@ onmessage = function(oEvent){
 		var cw = new Crossword(oEvent.data.word, oEvent.data.clue);
 	} catch(e){
 		postMessage({
-			err : e,
+			err : String(e),
 			errName: 'constructor'
 		});
 		return;
@@ -16,7 +16,6 @@ onmessage = function(oEvent){
 	// create the crossword grid (try to make it have a 1:1 width to height ratio in 10 tries)
 	var tries = 5000;
 	var grid = cw.getSquareGrid(tries);
-
 	// report a problem with the words in the crossword
 	if(grid == null){
 		var bad_words = cw.getBadWords();
@@ -24,11 +23,11 @@ onmessage = function(oEvent){
 		for(var i = 0; i < bad_words.length; i++){
 			str.push(bad_words[i].word);
 		}
-		alert("Shoot! :\n" + str.join("\n"));
+		console.log(cw);
 		postMessage({
-			err: 'A grid could not be created with these words: ',
+			err: 'A grid could not be created with these words: '+str.join(', '),
 			errName: 'badwords',
-			errWords: str
+			errWords: bad_words
 		});
 		return false;
 	}
@@ -37,6 +36,8 @@ onmessage = function(oEvent){
 	var show_answers = true;
 
 	postMessage({
-		resultHtml: CrosswordUtils.toHtml(grid, show_answers)
+		resultGrid:grid,
+		resultHtml: CrosswordUtils.toHtml(grid, show_answers),
+		resultWordsElements: cw.word_elements
 	})
 }
